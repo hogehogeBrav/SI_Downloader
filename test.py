@@ -105,7 +105,7 @@ IDirLabel.pack(side=LEFT)
 # 「フォルダ参照」エントリーの作成
 folder1 = StringVar()
 IDirEntry = ttk.Entry(frame1, textvariable=folder1, width=30,)
-IDirEntry.insert(0, os.path.join(os.environ.get("HOME") , 'Photo AI Generator'))
+IDirEntry.insert(0, os.path.join(os.path.expanduser("~") , 'Photo AI Generator'))
 IDirEntry.pack(side=LEFT)
 
 # 「フォルダ参照」ボタンの作成
