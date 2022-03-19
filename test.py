@@ -12,15 +12,17 @@ baseGround.geometry('550x200')
 #GUIの画面タイトル
 baseGround.title('Photo AI Generator')
 
-pb = ttk.Progressbar(baseGround,mode="indeterminate",length=200)
-
 # フォルダ指定の関数
 def dirdialog_clicked():
-    iDir = os.path.abspath(os.path.dirname(__file__))
-    iDirPath = filedialog.askdirectory(initialdir = iDir)
-    entry1.set(iDirPath)
+  iDir = os.path.abspath(os.path.dirname(__file__))
+  iDirPath = filedialog.askdirectory(initialdir = iDir)
+  entry1.set(iDirPath)
 
-def dlPhoto():
+def progress():
+  pb.start()
+  pb_label['text'] = "画像収集中..."
+
+def dl_photo():
   import glob
   from PIL import Image
   import pykakasi
@@ -33,15 +35,11 @@ def dlPhoto():
   # サイズ
   WIDTH = 256
   HEIGHT = 144
-
+  # ディレクトリ
   folder_dir = folder1.get()
 
-  def progress():
-    pb.start()
-    pb.pack()
-    pb.place(x=20, y=150)
-
   def get_photo():
+
     conv = kakasi.convert(value)
     hepburn_name = conv[0]['hepburn']
     
@@ -66,6 +64,7 @@ def dlPhoto():
         img_resize.save(os.path.join(new_dir_name, file))
     #プログレスバー停止
     pb.stop()
+    pb_label['text'] = "完了"
 
   thread1 = threading.Thread(target=progress)
   thread1.start()
@@ -89,7 +88,7 @@ input2_text.pack()
 input2_text.place(x=150, y=40)
 
 # ボタン
-btn = tk.Button(baseGround, text='画像を集める', command=dlPhoto)
+btn = tk.Button(baseGround, text='画像を集める', command=dl_photo)
 btn.pack()
 btn.place(x=20, y=110)
 
@@ -111,6 +110,14 @@ IDirEntry.pack(side=LEFT)
 # 「フォルダ参照」ボタンの作成
 IDirButton = ttk.Button(frame1, text="参照", command=dirdialog_clicked)
 IDirButton.pack(side=LEFT)
+
+pb = ttk.Progressbar(baseGround,mode="indeterminate",length=200)
+pb.pack()
+pb.place(x=20, y=150)
+
+pb_label = tk.Label(text='待機中')
+pb_label.pack()
+pb_label.place(x=250, y=150)
 
 
 #表示
