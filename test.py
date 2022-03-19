@@ -1,17 +1,26 @@
+import os,sys
 import threading
 import tkinter as tk
+from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
+from tkinter import filedialog
 
 baseGround = tk.Tk()
 # GUIの画面サイズ
-baseGround.geometry('300x200')
+baseGround.geometry('550x200')
 #GUIの画面タイトル
 baseGround.title('Photo AI Generator')
 
 pb = ttk.Progressbar(baseGround,mode="indeterminate",length=200)
 
+# フォルダ指定の関数
+def dirdialog_clicked():
+    iDir = os.path.abspath(os.path.dirname(__file__))
+    iDirPath = filedialog.askdirectory(initialdir = iDir)
+    entry1.set(iDirPath)
+
 def dlPhoto():
-  import os
   import glob
   from PIL import Image
   import pykakasi
@@ -25,7 +34,7 @@ def dlPhoto():
   WIDTH = 256
   HEIGHT = 144
 
-  folder_dir = './'
+  folder_dir = folder1.get()
 
   def progress():
     pb.start()
@@ -82,7 +91,27 @@ input2_text.place(x=150, y=40)
 # ボタン
 btn = tk.Button(baseGround, text='画像を集める', command=dlPhoto)
 btn.pack()
-btn.place(x=20, y=80)
+btn.place(x=20, y=110)
+
+# Frame1の作成
+frame1 = ttk.Frame(baseGround, padding=10)
+frame1.grid(row=0, column=1, sticky=E)
+frame1.place(x=0, y=70)
+
+# 「フォルダ参照」ラベルの作成
+IDirLabel = ttk.Label(frame1, text="画像保存先＞＞", padding=(5, 2))
+IDirLabel.pack(side=LEFT)
+
+# 「フォルダ参照」エントリーの作成
+folder1 = StringVar()
+IDirEntry = ttk.Entry(frame1, textvariable=folder1, width=30,)
+IDirEntry.insert(0, os.path.join(os.environ.get("HOME") , 'Photo AI Generator'))
+IDirEntry.pack(side=LEFT)
+
+# 「フォルダ参照」ボタンの作成
+IDirButton = ttk.Button(frame1, text="参照", command=dirdialog_clicked)
+IDirButton.pack(side=LEFT)
+
 
 #表示
 baseGround.mainloop()
