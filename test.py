@@ -1,4 +1,5 @@
 import os,sys
+from socket import inet_aton
 import threading
 import tkinter as tk
 from tkinter import *
@@ -9,7 +10,7 @@ from tkinter import filedialog
 baseGround = tk.Tk()
 # GUIの画面サイズ
 baseGround.geometry('550x200')
-#GUIの画面タイトル
+# GUIの画面タイトル
 baseGround.title('Photo AI Generator')
 
 # フォルダ指定の関数
@@ -39,7 +40,6 @@ def dl_photo():
   folder_dir = folder1.get()
 
   def get_photo():
-
     conv = kakasi.convert(value)
     hepburn_name = conv[0]['hepburn']
     
@@ -72,6 +72,45 @@ def dl_photo():
   thread2 = threading.Thread(target=get_photo)
   thread2.start()
 
+def photo_dirchk():
+  folder_dir = os.path.join(folder1.get() , 'resize')
+  folder = os.listdir(folder_dir)
+  dir = [f for f in folder if os.path.isdir(os.path.join(folder_dir, f))]
+  lists = tk.StringVar(value=dir)
+  # for index, item in enumerate(dir):
+  #   print("インデックス：" + str(index) + ", 値：" + item)
+  #   value = tk.Label(dirchk, text = 'インデックス：' + str(index) + ',  名前：' +item)
+  #   value.pack()
+  #   value.place(x=30 , y=(23 * (index + 1)))
+  
+  # 画面生成
+  dirchk = tk.Toplevel()
+  dirchk.geometry('300x380')
+  # ウインドウサイズ固定
+  dirchk.resizable(width=False, height=False)
+  # 親ウインドウ操作不能にする
+  dirchk.grab_set()
+  #GUIの画面タイトル
+  dirchk.title('収集済みの画像名')
+  # flame
+  dirchk_flame = ttk.Frame(dirchk)
+  dirchk_flame.pack(pady=20)
+  # 種類数
+  count = tk.Label(dirchk, text=str(len(dir)) + '種類')
+  count.pack()
+  # 各種ウィジェットの作成
+  Listbox = tk.Listbox(dirchk_flame, listvariable=lists, height=15)
+  # スクロールバーの作成
+  scrollbar = tk.Scrollbar(dirchk_flame, orient=tk.VERTICAL, command=Listbox.yview)
+  # スクロールバーをListboxに反映
+  Listbox["yscrollcommand"] = scrollbar.set
+  # 各種ウィジェットの設置
+  Listbox.grid(row=0, column=0)
+  scrollbar.grid(row=0, column=1, sticky=(tk.N, tk.S))
+  # 閉じるボタン
+  button = tk.Button(dirchk, text = '閉じる', command=dirchk.destroy)
+  button.pack()
+
 # テキストボックス１
 input1_label = tk.Label(text='集める画像の名前')
 input1_label.place(x=20, y=10)
@@ -87,15 +126,20 @@ input2_text.insert(0, 20)
 input2_text.pack()
 input2_text.place(x=150, y=40)
 
-# ボタン
-btn = tk.Button(baseGround, text='画像を集める', command=dl_photo)
+# 画像収集ボタン
+btn = tk.Button(baseGround, text='画像を収集', command=dl_photo)
 btn.pack()
 btn.place(x=20, y=110)
+
+# ボタン
+btn2 = tk.Button(baseGround, text='収集済みの画像名を確認', command=photo_dirchk)
+btn2.pack()
+btn2.place(x=130, y=110)
 
 # Frame1の作成
 frame1 = ttk.Frame(baseGround, padding=10)
 frame1.grid(row=0, column=1, sticky=E)
-frame1.place(x=0, y=70)
+frame1.place(x=5, y=70)
 
 # 「フォルダ参照」ラベルの作成
 IDirLabel = ttk.Label(frame1, text="画像保存先＞＞", padding=(5, 2))
@@ -118,7 +162,6 @@ pb.place(x=20, y=150)
 pb_label = tk.Label(text='待機中')
 pb_label.pack()
 pb_label.place(x=250, y=150)
-
 
 #表示
 baseGround.mainloop()
