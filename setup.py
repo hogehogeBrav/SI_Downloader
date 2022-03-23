@@ -10,13 +10,13 @@ base = None
 if sys.platform == 'win32' : base = 'Win32GUI'
 
 # exe にしたい python ファイルを指定
-exe = Executable(script = 'test.py',
+exe = Executable(script = 'SIDownloader.py',
                   base = base, 
                   icon='SIDownloader.ico'
                   )
 
 # セットアップ
 setup(name = 'SI Downloader',
-      version = 'Alpha 0.1',
+      version = '0.1',
       description = 'Simple Image Downloader',
       executables = [exe])
