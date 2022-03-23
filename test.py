@@ -19,7 +19,7 @@ from setuptools import Command
 
 baseGround = tk.Tk()
 # GUIの画面サイズ
-baseGround.geometry('550x260')
+baseGround.geometry('550x450')
 # ウインドウサイズ固定
 baseGround.resizable(width=False, height=False)
 # 背景色
@@ -28,7 +28,7 @@ baseGround.resizable(width=False, height=False)
 baseGround.title('Simple Image Downloader')
 
 flag = BooleanVar()
-flag.set(False)
+flag.set(True)
 
 # フォルダ指定の関数
 def dirdialog_clicked():
@@ -39,6 +39,31 @@ def dirdialog_clicked():
 def progress():
   pb.start()
   pb_label['text'] = "画像収集中..."
+
+def txt_chk():
+  flg = True
+  if not input1_text.get():
+    messagebox.showinfo('' , '画像の名前を入力してください。')
+    flg = False
+  if not input2_text.get():
+    messagebox.showinfo('' , '集める枚数を入力してください。')
+    flg = False
+  if flag.get():
+    if not resize_folder_text.get():
+      messagebox.showinfo('' , 'リサイズ画像の保存先フォルダ名を入力してください。')
+      flg = False
+    if not resize_width_text.get():
+      messagebox.showinfo('' , '横幅を入力してください。')
+      flg = False
+    if not resize_height_text.get():
+      messagebox.showinfo('' , '縦幅を入力してください。')
+      flg = False
+  if flg:
+    thread1 = threading.Thread(target=progress)
+    thread1.start()
+
+    thread2 = threading.Thread(target=dl_photo)
+    thread2.start()
 
 def dl_photo():
   import glob
@@ -51,21 +76,24 @@ def dl_photo():
   # 回数
   count = int(input2_text.get())
   # サイズ
-  WIDTH = 256
-  HEIGHT = 144
+  if flag.get():
+    WIDTH = int(resize_width_text.get())
+    HEIGHT = int(resize_height_text.get())
   # ディレクトリ
   folder_dir = folder1.get()
+  # リサイズフォルダ名
+  resize_dir = resize_folder_text.get()
 
-  def get_photo():
-    conv = kakasi.convert(value)
-    hepburn_name = conv[0]['hepburn']
-    
-    from icrawler.builtin import BingImageCrawler
-    crawler = BingImageCrawler(storage={"root_dir": os.path.join(folder_dir , value)})
-    crawler.crawl(keyword=value , max_num=count)
+  conv = kakasi.convert(value)
+  hepburn_name = conv[0]['hepburn']
+  
+  from icrawler.builtin import BingImageCrawler
+  crawler = BingImageCrawler(storage={"root_dir": os.path.join(folder_dir , value)})
+  crawler.crawl(keyword=value , max_num=count)
 
+  if flag.get():
     dir_name = os.path.join(folder_dir , value)
-    new_dir_name = os.path.join(folder_dir , 'resize/' , hepburn_name)
+    new_dir_name = os.path.join(folder_dir , resize_dir , hepburn_name)
     if not os.path.exists(new_dir_name):
       os.makedirs(new_dir_name)
 
@@ -79,25 +107,20 @@ def dl_photo():
         img_resize = img.resize(size=(WIDTH, HEIGHT))
         #縮小した画像を別フォルダに保存
         img_resize.save(os.path.join(new_dir_name, file))
-    #プログレスバー停止
-    pb.stop()
-    pb_label['text'] = "完了"
-
-  thread1 = threading.Thread(target=progress)
-  thread1.start()
-
-  thread2 = threading.Thread(target=get_photo)
-  thread2.start()
+  #プログレスバー停止
+  pb.stop()
+  pb_label['text'] = "完了"
 
 def photo_dirchk():
-  folder_dir = os.path.join(folder1.get() , 'resize')
-  if not os.path.isfile(folder_dir):
-    messagebox.showinfo('収集済みの画像名' , '画像がまだダウンロードされていません。')
+  folder_dir = folder1.get()
+  folder = os.listdir(folder_dir)
+  print(os.listdir(folder_dir))
+  dir = [f for f in folder if os.path.isdir(os.path.join(folder_dir, f))]
+  lists = tk.StringVar(value=dir)
+  
+  if len(dir) == 0:
+    messagebox.showinfo('収集済みの画像名' , '選択されたディレクトリには画像がダウンロードされていません。')
   else:
-    folder = os.listdir(folder_dir)
-    dir = [f for f in folder if os.path.isdir(os.path.join(folder_dir, f))]
-    lists = tk.StringVar(value=dir)
-    
     # 画面生成
     dirchk = tk.Toplevel()
     dirchk.geometry('300x380')
@@ -127,12 +150,16 @@ def photo_dirchk():
     button.pack()
 
 def change_state():
-    if flag.get():
-        new_state = 'normal'
-    else:
-        new_state = 'disabled'
-    for b in buttons:
-        b.configure(state = new_state)
+  if flag.get():
+      new_state = 'normal'
+  else:
+    new_state = 'disabled'
+  resize_folder_label.configure(state = new_state)
+  resize_folder_text.configure(state = new_state)
+  resize_width_label.configure(state = new_state)
+  resize_width_text.configure(state = new_state)
+  resize_height_label.configure(state = new_state)
+  resize_height_text.configure(state = new_state)
 
 # 画像設定フレーム
 frame_main = tk.LabelFrame(baseGround , text="画像設定" , fg="green")
@@ -164,18 +191,43 @@ input2_text.pack(side=LEFT)
 
 
 frame_resize = tk.LabelFrame(baseGround , labelwidget=Checkbutton(baseGround , text="リサイズする" , variable=flag, command=change_state))
-frame_resize.grid(row=0, column=1, sticky=E)
+frame_resize.place(x=10 , y=120)
 
-input1_label = tk.Label(frame_resize , text='保存先フォルダ名' , width=20 , anchor=tk.W)
-input1_label.pack(side=LEFT)
-input1_text = tk.Entry(frame_resize)
-input1_text.pack(side=LEFT)
+frame_resizefolder = ttk.Frame(frame_resize , padding=5)
+frame_resizefolder.grid(row=0, column=1, sticky=E)
+
+frame_resizeheight = ttk.Frame(frame_resize , padding=5)
+frame_resizeheight.grid(row=1, column=1, sticky=E)
+
+frame_resizewidth = ttk.Frame(frame_resize , padding=5)
+frame_resizewidth.grid(row=2, column=1, sticky=E)
+
+# 保存先フォルダ名
+resize_folder_label = tk.Label(frame_resizefolder , text='保存先フォルダ名' , width=20 , anchor=tk.W , state="normal")
+resize_folder_label.pack(side=LEFT)
+resize_folder_text = tk.Entry(frame_resizefolder , state="normal")
+resize_folder_text.insert(0 , "resize")
+resize_folder_text.pack(side=LEFT)
+
+# 縦幅
+resize_height_label = tk.Label(frame_resizeheight , text='縦幅(ピクセル)' , width=20 , anchor=tk.W , state="normal")
+resize_height_label.pack(side=LEFT)
+resize_height_text = tk.Entry(frame_resizeheight , state="normal")
+resize_height_text.insert(0 , 144)
+resize_height_text.pack(side=LEFT)
+
+# 横幅
+resize_width_label = tk.Label(frame_resizewidth , text='横幅(ピクセル)' , width=20 , anchor=tk.W , state="normal")
+resize_width_label.pack(side=LEFT)
+resize_width_text = tk.Entry(frame_resizewidth , state="normal")
+resize_width_text.insert(0 , 256)
+resize_width_text.pack(side=LEFT)
 
 
 # Frame1の作成
 frame1 = tk.LabelFrame(baseGround, text="保存先ディレクトリ設定" , fg="blue")
 frame1.grid(row=0, column=1, sticky=E)
-frame1.place(x=10, y=100)
+frame1.place(x=10, y=280)
 
 # 「フォルダ参照」ラベルの作成
 IDirLabel = ttk.Label(frame1, text="画像保存先＞＞", padding=(5, 2))
@@ -193,22 +245,22 @@ IDirButton.pack(side=LEFT)
 
 
 # 画像収集ボタン
-btn = tk.Button(baseGround, text='画像を収集', command=dl_photo)
+btn = tk.Button(baseGround, text='画像を収集', command=txt_chk)
 btn.pack()
-btn.place(x=20, y=160)
+btn.place(x=20, y=340)
 
 # 種類確認ボタン
 btn2 = tk.Button(baseGround, text='収集済みの画像名を確認', command=photo_dirchk)
 btn2.pack()
-btn2.place(x=120, y=160)
+btn2.place(x=120, y=340)
 
 pb = ttk.Progressbar(baseGround,mode="indeterminate",length=200)
 pb.pack()
-pb.place(x=20, y=220)
+pb.place(x=20, y=380)
 
 pb_label = tk.Label(text='待機中')
 pb_label.pack()
-pb_label.place(x=250, y=220)
+pb_label.place(x=250, y=380)
 
 #表示
 baseGround.mainloop()
