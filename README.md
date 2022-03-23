@@ -1,5 +1,5 @@
 # SI_Downloader
-tkinter & cx_freezeの学習で作成
+tkinter & cx_freezeの学習で作成  
 画像分類の学習画像集め等に使用できるシンプルな画像収集アプリケーション
 
 ## Feauture
@@ -9,9 +9,9 @@ tkinter & cx_freezeの学習で作成
 - 収集した画像名の一覧表示
 
 ## How to use
-- Mac
+- Mac  
  SIDownloader-[version].app
 
-- Windows
+- Windows  
 SIDownloader-[version]_windows.zip
 
