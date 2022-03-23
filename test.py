@@ -17,8 +17,12 @@ from setuptools import Command
 baseGround = tk.Tk()
 # GUIの画面サイズ
 baseGround.geometry('550x230')
+# ウインドウサイズ固定
+baseGround.resizable(width=False, height=False)
+# 背景色
+# baseGround.configure(bg='white')
 # GUIの画面タイトル
-baseGround.title('Photo AI Generator')
+baseGround.title('Simple Image Downloader')
 
 # フォルダ指定の関数
 def dirdialog_clicked():
@@ -81,42 +85,40 @@ def dl_photo():
 
 def photo_dirchk():
   folder_dir = os.path.join(folder1.get() , 'resize')
-  folder = os.listdir(folder_dir)
-  dir = [f for f in folder if os.path.isdir(os.path.join(folder_dir, f))]
-  lists = tk.StringVar(value=dir)
-  # for index, item in enumerate(dir):
-  #   print("インデックス：" + str(index) + ", 値：" + item)
-  #   value = tk.Label(dirchk, text = 'インデックス：' + str(index) + ',  名前：' +item)
-  #   value.pack()
-  #   value.place(x=30 , y=(23 * (index + 1)))
-  
-  # 画面生成
-  dirchk = tk.Toplevel()
-  dirchk.geometry('300x380')
-  # ウインドウサイズ固定
-  dirchk.resizable(width=False, height=False)
-  # 親ウインドウ操作不能にする
-  dirchk.grab_set()
-  #GUIの画面タイトル
-  dirchk.title('収集済みの画像名')
-  # flame
-  dirchk_flame = ttk.Frame(dirchk)
-  dirchk_flame.pack(pady=20)
-  # 種類数
-  count = tk.Label(dirchk, text=str(len(dir)) + '種類')
-  count.pack()
-  # 各種ウィジェットの作成
-  Listbox = tk.Listbox(dirchk_flame, listvariable=lists, height=15)
-  # スクロールバーの作成
-  scrollbar = tk.Scrollbar(dirchk_flame, orient=tk.VERTICAL, command=Listbox.yview)
-  # スクロールバーをListboxに反映
-  Listbox["yscrollcommand"] = scrollbar.set
-  # 各種ウィジェットの設置
-  Listbox.grid(row=0, column=0)
-  scrollbar.grid(row=0, column=1, sticky=(tk.N, tk.S))
-  # 閉じるボタン
-  button = tk.Button(dirchk, text = '閉じる', command=dirchk.destroy)
-  button.pack()
+  if not os.path.isfile(folder_dir):
+    messagebox.showinfo('収集済みの画像名' , '画像がまだダウンロードされていません。')
+  else:
+    folder = os.listdir(folder_dir)
+    dir = [f for f in folder if os.path.isdir(os.path.join(folder_dir, f))]
+    lists = tk.StringVar(value=dir)
+    
+    # 画面生成
+    dirchk = tk.Toplevel()
+    dirchk.geometry('300x380')
+    # ウインドウサイズ固定
+    dirchk.resizable(width=False, height=False)
+    # 親ウインドウ操作不能にする
+    dirchk.grab_set()
+    #GUIの画面タイトル
+    dirchk.title('収集済みの画像名')
+    # flame
+    dirchk_flame = ttk.Frame(dirchk)
+    dirchk_flame.pack(pady=20)
+    # 種類数
+    count = tk.Label(dirchk, text=str(len(dir)) + '種類')
+    count.pack()
+    # 各種ウィジェットの作成
+    Listbox = tk.Listbox(dirchk_flame, listvariable=lists, height=15)
+    # スクロールバーの作成
+    scrollbar = tk.Scrollbar(dirchk_flame, orient=tk.VERTICAL, command=Listbox.yview)
+    # スクロールバーをListboxに反映
+    Listbox["yscrollcommand"] = scrollbar.set
+    # 各種ウィジェットの設置
+    Listbox.grid(row=0, column=0)
+    scrollbar.grid(row=0, column=1, sticky=(tk.N, tk.S))
+    # 閉じるボタン
+    button = tk.Button(dirchk, text = '閉じる', command=dirchk.destroy)
+    button.pack()
 
 
 # テキストボックス１
@@ -156,7 +158,7 @@ IDirLabel.pack(side=LEFT)
 # 「フォルダ参照」エントリーの作成
 folder1 = StringVar()
 IDirEntry = ttk.Entry(frame1, textvariable=folder1, width=30,)
-IDirEntry.insert(0, os.path.join(os.path.expanduser("~") , 'Photo AI Generator'))
+IDirEntry.insert(0, os.path.join(os.path.expanduser("~") , 'Simple Image Downloader'))
 IDirEntry.pack(side=LEFT)
 
 # 「フォルダ参照」ボタンの作成
