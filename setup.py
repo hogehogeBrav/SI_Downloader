@@ -11,7 +11,7 @@ if sys.platform == 'win32' : base = 'Win32GUI'
 
 # exe にしたい python ファイルを指定
 exe = Executable(script = 'SIDownloader.py',
-                  base = base, 
+                  base = base,
                   icon='SIDownloader.ico'
                   )
 
