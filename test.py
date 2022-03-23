@@ -24,7 +24,7 @@ baseGround.title('Photo AI Generator')
 def dirdialog_clicked():
   iDir = os.path.abspath(os.path.dirname(__file__))
   iDirPath = filedialog.askdirectory(initialdir = iDir)
-  entry1.set(iDirPath)
+  folder1.set(iDirPath)
 
 def progress():
   pb.start()
