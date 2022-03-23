@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+from email.mime import base
 from importlib.util import set_loader
 from lib2to3.pgen2.pgen import generate_grammar
 import os,sys
@@ -11,18 +12,23 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
+from turtle import left
+from pyrsistent import b
 
 from setuptools import Command
 
 baseGround = tk.Tk()
 # GUIの画面サイズ
-baseGround.geometry('550x230')
+baseGround.geometry('550x260')
 # ウインドウサイズ固定
 baseGround.resizable(width=False, height=False)
 # 背景色
 # baseGround.configure(bg='white')
 # GUIの画面タイトル
 baseGround.title('Simple Image Downloader')
+
+flag = BooleanVar()
+flag.set(False)
 
 # フォルダ指定の関数
 def dirdialog_clicked():
@@ -120,36 +126,56 @@ def photo_dirchk():
     button = tk.Button(dirchk, text = '閉じる', command=dirchk.destroy)
     button.pack()
 
+def change_state():
+    if flag.get():
+        new_state = 'normal'
+    else:
+        new_state = 'disabled'
+    for b in buttons:
+        b.configure(state = new_state)
+
+# 画像設定フレーム
+frame_main = tk.LabelFrame(baseGround , text="画像設定" , fg="green")
+frame_main.grid(row=0, column=1, sticky=E)
+frame_main.place(x=10, y=10)
+
+frame_photoname = ttk.Frame(frame_main , padding=5)
+frame_photoname.grid(row=0, column=1, sticky=E)
+
+frame_photocnt = ttk.Frame(frame_main , padding=5)
+frame_photocnt.grid(row=1, column=1, sticky=E)
 
 # テキストボックス１
-input1_label = tk.Label(text='集める画像の名前')
-input1_label.place(x=20, y=10)
-input1_text = tk.Entry()
-input1_text.pack()
-input1_text.place(x=150, y=10)
+input1_label = tk.Label(frame_photoname , text='集める画像の名前' , width=20 , anchor=tk.W)
+input1_label.pack(side=LEFT)
+# input1_label.place(x=20, y=10)
+input1_text = tk.Entry(frame_photoname)
+input1_text.pack(side=LEFT)
+# input1_text.place(frame_main , x=150, y=10)
 
 #テキストボックス２
-input2_label = tk.Label(text='集める枚数')
-input2_label.place(x=20, y=40)
-input2_text = tk.Entry()
+input2_label = tk.Label(frame_photocnt , text='集める枚数' , width=20 , anchor=tk.W)
+input2_label.pack(side=LEFT)
+# input2_label.place(x=20, y=40)
+input2_text = tk.Entry(frame_photocnt)
 input2_text.insert(0, 20)
-input2_text.pack()
-input2_text.place(x=150, y=40)
+input2_text.pack(side=LEFT)
+# input2_text.place(x=150, y=40)
 
-# 画像収集ボタン
-btn = tk.Button(baseGround, text='画像を収集', command=dl_photo)
-btn.pack()
-btn.place(x=20, y=120)
 
-# 種類確認ボタン
-btn2 = tk.Button(baseGround, text='収集済みの画像名を確認', command=photo_dirchk)
-btn2.pack()
-btn2.place(x=120, y=120)
+frame_resize = tk.LabelFrame(baseGround , labelwidget=Checkbutton(baseGround , text="リサイズする" , variable=flag, command=change_state))
+frame_resize.grid(row=0, column=1, sticky=E)
+
+input1_label = tk.Label(frame_resize , text='保存先フォルダ名' , width=20 , anchor=tk.W)
+input1_label.pack(side=LEFT)
+input1_text = tk.Entry(frame_resize)
+input1_text.pack(side=LEFT)
+
 
 # Frame1の作成
-frame1 = ttk.Frame(baseGround, padding=10)
+frame1 = tk.LabelFrame(baseGround, text="保存先ディレクトリ設定" , fg="blue")
 frame1.grid(row=0, column=1, sticky=E)
-frame1.place(x=5, y=70)
+frame1.place(x=10, y=100)
 
 # 「フォルダ参照」ラベルの作成
 IDirLabel = ttk.Label(frame1, text="画像保存先＞＞", padding=(5, 2))
@@ -165,13 +191,24 @@ IDirEntry.pack(side=LEFT)
 IDirButton = ttk.Button(frame1, text="参照", command=dirdialog_clicked)
 IDirButton.pack(side=LEFT)
 
+
+# 画像収集ボタン
+btn = tk.Button(baseGround, text='画像を収集', command=dl_photo)
+btn.pack()
+btn.place(x=20, y=160)
+
+# 種類確認ボタン
+btn2 = tk.Button(baseGround, text='収集済みの画像名を確認', command=photo_dirchk)
+btn2.pack()
+btn2.place(x=120, y=160)
+
 pb = ttk.Progressbar(baseGround,mode="indeterminate",length=200)
 pb.pack()
-pb.place(x=20, y=180)
+pb.place(x=20, y=220)
 
 pb_label = tk.Label(text='待機中')
 pb_label.pack()
-pb_label.place(x=250, y=180)
+pb_label.place(x=250, y=220)
 
 #表示
 baseGround.mainloop()
