@@ -91,7 +91,9 @@ def dl_photo():
   crawler = BingImageCrawler(storage={"root_dir": os.path.join(folder_dir , value)})
   crawler.crawl(keyword=value , max_num=count)
 
+  # リサイズ処理
   if flag.get():
+    pb_label['text'] = "リサイズ中..."
     dir_name = os.path.join(folder_dir , value)
     new_dir_name = os.path.join(folder_dir , resize_dir , hepburn_name)
     if not os.path.exists(new_dir_name):
