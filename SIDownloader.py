@@ -35,8 +35,6 @@ def dirdialog_clicked():
   iDir = os.path.abspath(os.path.dirname(__file__))
   iDir = folder1.get()
   iDirPath = filedialog.askdirectory(initialdir = iDir)
-  print(iDir)
-  print(iDirPath)
   if iDirPath:
     folder1.set(iDirPath)
   else:
