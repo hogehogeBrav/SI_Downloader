@@ -10,7 +10,7 @@ tkinter & cx_freeze
 
 ## How to use
 - Mac  
- SIDownloader-[version].app
+ SIDownloader-[version]_Macos.app.zip
 
 - Windows  
 SIDownloader-[version]_windows.zip
