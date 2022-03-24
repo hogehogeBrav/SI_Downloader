@@ -33,9 +33,16 @@ flag.set(True)
 # フォルダ指定の関数
 def dirdialog_clicked():
   iDir = os.path.abspath(os.path.dirname(__file__))
+  iDir = folder1.get()
   iDirPath = filedialog.askdirectory(initialdir = iDir)
-  folder1.set(iDirPath)
+  print(iDir)
+  print(iDirPath)
+  if iDirPath:
+    folder1.set(iDirPath)
+  else:
+    folder1.set(iDir)
 
+# プログレスバー開始
 def progress():
   pb.start()
   pb_label['text'] = "画像収集中..."
@@ -65,6 +72,7 @@ def txt_chk():
     thread2 = threading.Thread(target=dl_photo)
     thread2.start()
 
+# 画像ダウンロード
 def dl_photo():
   import glob
   from PIL import Image
@@ -113,6 +121,7 @@ def dl_photo():
   pb.stop()
   pb_label['text'] = "完了"
 
+# ディレクトリチェック
 def photo_dirchk():
   folder_dir = folder1.get()
   folder = os.listdir(folder_dir)
@@ -151,6 +160,7 @@ def photo_dirchk():
     button = tk.Button(dirchk, text = '閉じる', command=dirchk.destroy)
     button.pack()
 
+# リサイズチェックボックス
 def change_state():
   if flag.get():
       new_state = 'normal'
