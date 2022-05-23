@@ -17,6 +17,6 @@ exe = Executable(script = 'SIDownloader.py',
 
 # セットアップ
 setup(name = 'SI Downloader',
-      version = '0.1',
+      version = '0.11',
       description = 'Simple Image Downloader',
       executables = [exe])
